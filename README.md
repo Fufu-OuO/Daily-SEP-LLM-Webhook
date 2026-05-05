@@ -1,8 +1,7 @@
 <!-- markdownlint-disable MD033 MD041 -->
 <div align="center">
-  <img alt="LOGO" src="./assets/images/logo/DailySEP.png" width="256" height="256" />
-*logo 由 ChatGPT 生成*
-  <br>
+  <img alt="LOGO" src="./assets/images/logo/DailySEP.png" width="256" height="256" /><br>
+*logo 由 ChatGPT 生成*<br>
 <h1>DailySEP</h1>
 </div>
 
@@ -16,7 +15,7 @@
 - [**功能**](#功能)
 - [**快速开始**](#快速开始)
   - [1. Fork 并克隆项目](#1-fork-并克隆项目)
-  - [2. 配置 GitHub Secrets](#2-（推荐！）配置-github-secrets)
+  - [2. （推荐！）配置 GitHub Secrets](#2-（推荐！）配置-github-secrets)
   - [3. 本地配置](#3-本地配置)
   - [4. 手动测试](#4-手动测试)
 - [**默认推送时间**](#默认推送时间)
@@ -52,8 +51,8 @@ cd DailySEP
 1. 在 Fork 后的 GitHub 仓库首页，点击 Settings 选项卡。
 2. 左侧菜单选择 Secrets and variables → Actions。
 3. 点击 New repository secret，分别添加以下两个密钥：
-- DEEPSEEK_API_KEY → 粘贴你的 DeepSeek API Key。
-- FEISHU_WEBHOOK_URL → 粘贴你的飞书 Webhook 完整地址。
+  - DEEPSEEK_API_KEY → 粘贴你的 DeepSeek API Key。
+  - FEISHU_WEBHOOK_URL → 粘贴你的飞书 Webhook 完整地址。
 ### 3. 本地配置
 如选择本地配置，请自行创建 `.env` 文件，内容如下：
 ```
