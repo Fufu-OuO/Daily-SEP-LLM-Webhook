@@ -11,14 +11,21 @@ DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 FEISHU_WEBHOOK_URL = os.getenv("FEISHU_WEBHOOK_URL")
 
 def get_sep_entries():
-    """随机抓取一篇最新的 SEP 条目并返回"""
     rss_url = "https://plato.stanford.edu/rss/sep.xml"
     entries = []
     try:
-        resp = requests.get(rss_url, timeout=15)
+        headers = {"User-Agent": "Mozilla/5.0 (compatible; DailyPhilosophyBot/1.0)"}
+        resp = requests.get(rss_url, headers=headers, timeout=15)
+        print(f"SEP 状态码: {resp.status_code}")
+        if resp.status_code != 200:
+            print(f"请求失败，响应内容: {resp.text[:200]}...")
+            return entries
+
         tree = ET.fromstring(resp.text)
         ns = {"rss": "http://www.w3.org/2005/Atom"}
-        for entry in tree.findall(".//rss:entry", ns)[:5]:
+        found = tree.findall(".//rss:entry", ns)
+        print(f"找到 {len(found)} 个条目")
+        for entry in found[:5]:
             title = entry.find("rss:title", ns).text
             link = entry.find("rss:link", ns).attrib["href"]
             entries.append({"title": title, "link": link})
