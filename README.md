@@ -3,8 +3,9 @@
   <img alt="LOGO" src="./assets/images/logo/DailySEP.png" width="256" height="256" />
 *logo 由 ChatGPT 生成*
   <br>
-
 <h1>DailySEP</h1>
+</div>
+
 1. 自动抓取斯坦福哲学百科（SEP）的最新文章，<br>
 2. 通过 DeepSeek 生成中文摘要，<br>
 3. 通过飞书自定义机器人推送到飞书群聊。
