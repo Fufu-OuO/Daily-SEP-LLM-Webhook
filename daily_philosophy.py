@@ -11,27 +11,75 @@ DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 FEISHU_WEBHOOK_URL = os.getenv("FEISHU_WEBHOOK_URL")
 
 def get_sep_entries():
-    rss_url = "https://plato.stanford.edu/rss/sep.xml"
+    # 尝试备用地址
+    rss_urls = [
+        "https://plato.stanford.edu/rss/sep.xml",
+        "https://plato.stanford.edu/rss/recent.xml",  # 备用
+    ]
     entries = []
-    try:
-        headers = {"User-Agent": "Mozilla/5.0 (compatible; DailyPhilosophyBot/1.0)"}
-        resp = requests.get(rss_url, headers=headers, timeout=15)
-        print(f"SEP 状态码: {resp.status_code}")
-        if resp.status_code != 200:
-            print(f"请求失败，响应内容: {resp.text[:200]}...")
-            return entries
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; DailyPhilosophyBot/1.0)"}
 
-        tree = ET.fromstring(resp.text)
-        ns = {"rss": "http://www.w3.org/2005/Atom"}
-        found = tree.findall(".//rss:entry", ns)
-        print(f"找到 {len(found)} 个条目")
-        for entry in found[:5]:
-            title = entry.find("rss:title", ns).text
-            link = entry.find("rss:link", ns).attrib["href"]
-            entries.append({"title": title, "link": link})
-    except Exception as e:
-        print(f"获取 SEP 条目失败：{e}")
+    for rss_url in rss_urls:
+        try:
+            resp = requests.get(rss_url, headers=headers, timeout=15)
+            print(f"URL: {rss_url} | 状态码: {resp.status_code}")
+
+            if resp.status_code != 200:
+                continue
+
+            # 打印原始内容，方便调试结构
+            print("原始内容前500字：\n", resp.text[:500])
+
+            tree = ET.fromstring(resp.text)
+
+            # 动态检测命名空间，不硬编码
+            # Atom feed 的根标签通常是 {http://www.w3.org/2005/Atom}feed
+            atom_ns = "http://www.w3.org/2005/Atom"
+            ns = {"atom": atom_ns}
+
+            # 兼容 Atom 和 RSS 两种格式
+            found = tree.findall(".//atom:entry", ns)
+
+            if not found:
+                # 尝试 RSS 2.0 格式（无命名空间）
+                found = tree.findall(".//item")
+                print(f"RSS 2.0 模式，找到 {len(found)} 个条目")
+                for item in found[:5]:
+                    title_el = item.find("title")
+                    link_el = item.find("link")
+                    if title_el is not None and link_el is not None:
+                        title = title_el.text or ""
+                        link = link_el.text or ""
+                        if title and link:
+                            entries.append({"title": title.strip(), "link": link.strip()})
+            else:
+                print(f"Atom 模式，找到 {len(found)} 个条目")
+                for entry in found[:5]:
+                    title_el = entry.find("atom:title", ns)
+                    link_el = entry.find("atom:link", ns)
+
+                    if title_el is None or link_el is None:
+                        continue
+
+                    title = title_el.text or ""
+
+                    # link 可能是 href 属性，也可能是文本
+                    link = link_el.attrib.get("href") or link_el.text or ""
+
+                    if title and link:
+                        entries.append({"title": title.strip(), "link": link.strip()})
+
+            if entries:
+                break  # 成功获取就退出循环
+
+        except ET.ParseError as e:
+            print(f"XML 解析失败：{e}")
+            print("原始响应：", resp.text[:300])
+        except Exception as e:
+            print(f"获取失败：{type(e).__name__}: {e}")
+
     return entries
+
 
 def call_deepseek(entry):
     """调用 DeepSeek 生成 SEP 条目导读"""
