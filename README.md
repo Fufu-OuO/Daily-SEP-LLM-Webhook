@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD033 MD041 -->
 <div align="center">
   <img alt="LOGO" src="./assets/images/logo/DailySEP.png" width="256" height="256" /><br>
-*logo 由 ChatGPT 生成*<br>
+logo 由 ChatGPT 生成<br>
 <h1>DailySEP</h1>
 </div>
 
