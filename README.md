@@ -2,7 +2,7 @@
 <div align="center">
   <img alt="LOGO" src="./assets/images/logo/DailySEP.png" width="256" height="256" /><br>
 logo 由 ChatGPT 生成<br>
-<h1>DailySEP</h1>
+<h1>Daily SEP-LLM-Webhook</h1>
 </div>
 
 1. 自动抓取斯坦福哲学百科（SEP）的最新文章，<br>
