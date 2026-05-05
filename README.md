@@ -36,7 +36,7 @@ logo 由 ChatGPT 生成<br>
 
 ## 快速开始
 
-> **准备工作**：[GitHub](https://github.com) 账号、飞书群聊、DeepSeek API。
+> **准备工作**：GitHub 账号、飞书群聊、DeepSeek API。
 
 ### 1. Fork 并克隆项目
 1. 点击本仓库右上角的 **Fork**，将项目复制到你的 GitHub 账户下。  
