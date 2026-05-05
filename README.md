@@ -12,19 +12,18 @@ logo 由 ChatGPT 生成<br>
 
 ## 目录
 
-- [**功能**](#功能)
-- [**快速开始**](#快速开始)
+- [功能](#功能)
+- [快速开始](#快速开始)
   - [1. Fork 并克隆项目](#1-fork-并克隆项目)
-  - [2. （推荐！）配置 GitHub Secrets](#2-（推荐！）配置-github-secrets)
+  - [2. 推荐！配置 GitHub Secrets](#2-推荐配置-github-secrets)
   - [3. 本地配置](#3-本地配置)
   - [4. 手动测试](#4-手动测试)
-- [**默认推送时间**](#默认推送时间)
-- [**自定义修改**](#自定义修改)
-  - [更换 AI 模型](#更换-ai-模型)
-  - [更换知识来源](#更换知识来源)
+- [自定义修改](#自定义修改)
   - [调整推送时间](#调整推送时间)
-- [**常见问题**](#常见问题)
-- [**鸣谢**](#鸣谢)
+  - [更换 AI 模型](#更换-ai-模型)
+  - [更换条目来源](#更换条目来源)
+- [常见问题](#常见问题)
+- [鸣谢](#鸣谢)
 
 ## 功能
 
@@ -47,7 +46,7 @@ git clone https://github.com/YOUR_NAME/DailySEP.git
 cd DailySEP
 ```
 
-### 2.（推荐！）配置 GitHub Secrets
+### 2. 推荐！配置 GitHub Secrets
 1. 在 Fork 后的 GitHub 仓库首页，点击 Settings 选项卡。
 2. 左侧菜单选择 Secrets and variables → Actions。
 3. 点击 New repository secret，分别添加以下两个密钥：
@@ -69,7 +68,7 @@ FEISHU_WEBHOOK_URL=你的飞书 Webhook 地址
 5. 检查飞书群聊，如果顺利，应该已经收到一条机器人消息。
 
 ## 自定义修改
-### 修改默认推送时间
+### 调整推送时间
 - 工作流默认设置为每日 UTC 23:00（北京时间早上 7:00）执行；
 - 可以通过修改 `.github/workflows/send.yml` 中的 `cron` 表达式来调整时间。
 ### 更换 AI 模型
@@ -77,3 +76,7 @@ FEISHU_WEBHOOK_URL=你的飞书 Webhook 地址
 ### 更换条目来源
 - 脚本默认使用 SEP 的 RSS 获取条目——如果你想换成其他来源的条目，请修改 `get_sep_entries` 函数；
 - 同理，可以将 SEP 替换成任意内容来源——只要你可以从 `get_sep_entries` 里头获取内容。
+
+## 常见问题
+
+## 鸣谢
