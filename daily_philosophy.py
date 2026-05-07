@@ -81,9 +81,8 @@ def get_sep_entries():
 
     return entries
 
-
-def call_deepseek(entry):
-    """调用 DeepSeek 生成 SEP 条目导读"""
+def call_deepseek(entry, retries=2):
+    """调用 DeepSeek 生成 SEP 条目导读（含重试）"""
     url = "https://api.deepseek.com/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
@@ -101,113 +100,43 @@ def call_deepseek(entry):
         '{entry['title']}'
         {entry['link']}
 
-        你的任务不是“总结内容”，而是帮助读者理解：
-
-        “这个哲学问题为何会出现，以及它为何重要。”
+        你的任务不是"总结内容"，而是帮助读者理解：
+        "这个哲学问题为何会出现，以及它为何重要。"
 
         请生成一篇 1200-1800 字左右的中文哲学导读。
 
-        要求：
-
-        【总体原则】
-
-        - 不要只罗列观点
-        - 不要写成百科摘要
-        - 要突出“问题如何形成”
-        - 要说明不同理论是在回应什么困难
-        - 要让读者感受到：
-          “哲学不是答案堆积，而是问题推进”
-
         【写作结构】
-
         1. 问题背景（最重要）
-        说明：
-        - 这个哲学问题是在什么思想压力下出现的？
-        - 它试图解决什么矛盾、困难或悖论？
-        - 如果没有这个理论，人们会遇到什么问题？
-
         2. 核心思想
-        说明：
-        - 该理论/概念的核心主张是什么？
-        - 它如何回应上述问题？
-        - 它改变了人们理解世界的哪种方式？
-
         3. 主要争论
-        说明：
-        - 有哪些重要支持者与批评者？
-        - 争议焦点是什么？
-        - 为什么直到今天它仍有影响力？
-
         4. 一个具体例子
-        使用：
-        - 日常经验
-        - 科学案例
-        - 伦理困境
-        - 语言现象
-        - AI 或现代技术
-
-        来帮助理解这一哲学问题。
-
         5. 开放问题
-        最后提出一个真正具有哲学张力的问题，
-        让读者意识到：
-        这个问题并未真正结束。
 
         【语言要求】
+        - 面向哲学系研究生初学者，避免空洞抒情
+        - 人名/书名格式：原文（中文），例如 Immanuel Kant（伊曼努尔·康德）
 
-        - 使用清晰、自然、准确的中文
-        - 面向“哲学系研究生初学者”
-        - 避免空洞抒情
-        - 避免过度术语化
-        - 不要机械罗列人物
-
-        【术语格式】
-
-        人名/书名格式：
-        原文（中文）
-
-        例如：
-        Immanuel Kant（伊曼努尔·康德）
-        Being and Time（《存在与时间》）
-
-        【最重要要求】
-
-        不要把哲学理论写成“知识点”；
-        而要把它写成：
-        “人类为何不得不思考这个问题”。
-        """
+        不要把哲学理论写成"知识点"，而要写成"人类为何不得不思考这个问题"。
+    """
     payload = {
         "model": "deepseek-v4-flash",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.8
     }
-    resp = requests.post(url, headers=headers, json=payload, timeout=300)
-    if resp.status_code == 200:
-        return resp.json()["choices"][0]["message"]["content"]
-    else:
-        print(f"DeepSeek API 错误：{resp.status_code} {resp.text}")
-        return None
-
-def call_deepseek(entry, retries=2):
-    url = "https://api.deepseek.com/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    # ...省略 prompt 和 payload 定义...
 
     for attempt in range(retries + 1):
         try:
-            resp = requests.post(url, headers=headers, json=payload, timeout=120)
+            resp = requests.post(url, headers=headers, json=payload, timeout=300)
             if resp.status_code == 200:
                 return resp.json()["choices"][0]["message"]["content"]
             else:
                 print(f"DeepSeek API 错误：{resp.status_code} {resp.text}")
                 return None
         except requests.exceptions.Timeout:
-            print(f"第 {attempt + 1} 次请求超时，{'重试中…' if attempt < retries else '放弃。'}")
+            print(f"第 {attempt + 1} 次请求超时，{'重试中……' if attempt < retries else '放弃。'}")
             if attempt < retries:
                 time.sleep(5)
+
     return None
 
 def send_to_feishu(title, summary, link):
