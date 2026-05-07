@@ -79,5 +79,6 @@ FEISHU_WEBHOOK_URL=你的飞书 Webhook 地址
 - 同理，可以根据你自己的需要调整 prompt.
 
 ## 常见问题
-
+1. 如何单次/按需运行？
+  - 依次进入 Repository - Actions - Daily Philosophy Card - Run Workflow (main) 即可。
 ## 鸣谢
