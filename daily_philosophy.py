@@ -3,6 +3,7 @@ import json
 import xml.etree.ElementTree as ET
 import random
 import os
+import time
 from dotenv import load_dotenv
 
 # 加载 .env 文件中的私密变量
@@ -180,12 +181,34 @@ def call_deepseek(entry):
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.8
     }
-    resp = requests.post(url, headers=headers, json=payload, timeout=30)
+    resp = requests.post(url, headers=headers, json=payload, timeout=300)
     if resp.status_code == 200:
         return resp.json()["choices"][0]["message"]["content"]
     else:
         print(f"DeepSeek API 错误：{resp.status_code} {resp.text}")
         return None
+
+def call_deepseek(entry, retries=2):
+    url = "https://api.deepseek.com/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    # ...省略 prompt 和 payload 定义...
+
+    for attempt in range(retries + 1):
+        try:
+            resp = requests.post(url, headers=headers, json=payload, timeout=120)
+            if resp.status_code == 200:
+                return resp.json()["choices"][0]["message"]["content"]
+            else:
+                print(f"DeepSeek API 错误：{resp.status_code} {resp.text}")
+                return None
+        except requests.exceptions.Timeout:
+            print(f"第 {attempt + 1} 次请求超时，{'重试中…' if attempt < retries else '放弃。'}")
+            if attempt < retries:
+                time.sleep(5)
+    return None
 
 def send_to_feishu(title, summary, link):
     """发送消息卡片到你的飞书群"""
