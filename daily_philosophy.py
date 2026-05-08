@@ -12,10 +12,48 @@ DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 FEISHU_WEBHOOK_URL = os.getenv("FEISHU_WEBHOOK_URL")
 
 def get_sep_entries():
-    # 尝试备用地址
+    """从 SEP 目录页抓取全量条目，随机返回 2 个"""
+    url = "https://plato.stanford.edu/contents.html"
+    headers = {"User-Agent": "Mozilla/5.0 (compatible; DailyPhilosophyBot/1.0)"}
+    entries = []
+
+    try:
+        resp = requests.get(url, headers=headers, timeout=15)
+        print(f"SEP 目录页状态码: {resp.status_code}")
+        if resp.status_code != 200:
+            print("目录页请求失败，回退到 RSS")
+            return get_sep_rss_entries()  # 降级到原来的 RSS 方案
+
+        # 用正则从 href 里提取所有条目链接
+        # 格式如：<a href="entries/action/">Action</a>
+        import re
+        pattern = r'href="(entries/[a-z0-9\-]+/)"[^>]*>([^<]+)</a>'
+        matches = re.findall(pattern, resp.text)
+        print(f"找到 {len(matches)} 个条目")
+
+        all_entries = [
+            {
+                "title": title.strip(),
+                "link": f"https://plato.stanford.edu/{path}"
+            }
+            for path, title in matches
+            if title.strip()  # 过滤空标题
+        ]
+
+        # 随机抽 2 个，保证每天不重复
+        entries = random.sample(all_entries, min(2, len(all_entries)))
+
+    except Exception as e:
+        print(f"获取目录失败：{type(e).__name__}: {e}，回退到 RSS")
+        return get_sep_rss_entries()
+
+    return entries
+
+def get_sep_rss_entries():
+    """原来的 RSS 方案，作为降级备用"""
     rss_urls = [
         "https://plato.stanford.edu/rss/sep.xml",
-        "https://plato.stanford.edu/rss/recent.xml",  # 备用
+        "https://plato.stanford.edu/rss/recent.xml",
     ]
     entries = []
     headers = {"User-Agent": "Mozilla/5.0 (compatible; DailyPhilosophyBot/1.0)"}
